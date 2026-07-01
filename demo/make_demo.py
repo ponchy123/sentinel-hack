@@ -10,7 +10,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 FRAMES_DIR = os.path.join(BASE, "frames")
 AUDIO_DIR = os.path.join(BASE, "audio")
 OUTPUT_DIR = os.path.join(BASE, "output")
-FFMPEG = r"D:\workspace\workbook\wb2\projectSoftware\ffmpeg\bin\ffmpeg.exe"
+FFMPEG = "ffmpeg"
 
 for d in [FRAMES_DIR, AUDIO_DIR, OUTPUT_DIR]:
     os.makedirs(d, exist_ok=True)
