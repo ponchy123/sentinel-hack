@@ -195,8 +195,54 @@ async def run_research(
     except Exception:
         pass
 
+    # BasedAI governance scoring
+    governance_scores = []
+    try:
+        from integrations.basedai import score_agent_decisions
+        agent_results_dict = {name: {"findings": r.findings, "source_count": r.source_count} for name, r in results.items()}
+        governance_scores = score_agent_decisions(agent_results_dict, topic)
+        if governance_scores:
+            avg_trust = sum(s.trust_score for s in governance_scores) / len(governance_scores)
+            avg_accountability = sum(s.accountability_score for s in governance_scores) / len(governance_scores)
+            parts.append(f"\n## BasedAI Governance\n\n")
+            parts.append(f"**Avg Trust Score**: {avg_trust:.2f}\n")
+            parts.append(f"**Avg Accountability**: {avg_accountability:.2f}\n")
+            parts.append(f"**Decisions Audited**: {len(governance_scores)}\n")
+    except Exception:
+        pass
+
+    # Kaspa on-chain verification
+    kaspa_record = None
+    try:
+        from integrations.kaspa import record_research_on_kaspa
+        agent_results_dict = {name: {"source_count": r.source_count} for name, r in results.items()}
+        kaspa_record = record_research_on_kaspa("\n".join(parts), topic, agent_results_dict)
+        if kaspa_record:
+            parts.append(f"\n## Kaspa On-Chain Record\n\n")
+            parts.append(f"**Report Hash**: `{kaspa_record.report_hash}`\n")
+            parts.append(f"**Tx ID**: `{kaspa_record.kaspa_tx_id}`\n")
+            parts.append(f"**Verified**: {'Yes' if kaspa_record.verified else 'Pending'}\n")
+    except Exception:
+        pass
+
+    # CoralOS agent registration
+    coral_result = None
+    try:
+        from integrations.coralos import register_sentinel_agents
+        coral_result = register_sentinel_agents()
+        if coral_result and coral_result.registrations:
+            parts.append(f"\n## CoralOS Agent Registry\n\n")
+            parts.append(f"**Agents Registered**: {coral_result.total_agents}\n")
+            for reg in coral_result.registrations:
+                parts.append(f"- {reg.agent_name}: `{reg.agent_id}` ({'verified' if reg.verified else 'pending'})\n")
+    except Exception:
+        pass
+
     return {
         "report": "\n".join(parts),
         "agents": {name: {"findings": r.findings, "source_count": r.source_count, "confidence": r.confidence, "sources": r.sources} for name, r in results.items()},
         "verification": verification,
+        "governance": [{"agent": s.agent_name, "trust": s.trust_score, "accountability": s.accountability_score} for s in governance_scores],
+        "kaspa": {"hash": kaspa_record.report_hash, "tx": kaspa_record.kaspa_tx_id, "verified": kaspa_record.verified} if kaspa_record else None,
+        "coralos": {"agents": coral_result.total_agents, "verified": coral_result.verified_count} if coral_result else None,
     }
