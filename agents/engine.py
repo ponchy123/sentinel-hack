@@ -238,6 +238,20 @@ async def run_research(
     except Exception:
         pass
 
+    # Ethereum on-chain verification (GCC & ETH Bounty)
+    eth_record = None
+    try:
+        from integrations.eth import record_research_on_eth
+        eth_record = record_research_on_eth("\n".join(parts), topic)
+        if eth_record:
+            parts.append(f"\n## Ethereum On-Chain Record (GCC & ETH Bounty)\n\n")
+            parts.append(f"**Report Hash**: `{eth_record.report_hash}`\n")
+            parts.append(f"**Tx Hash**: `{eth_record.tx_hash}`\n")
+            parts.append(f"**Network**: {eth_record.network}\n")
+            parts.append(f"**Verified**: {'Yes' if eth_record.verified else 'Pending'}\n")
+    except Exception:
+        pass
+
     return {
         "report": "\n".join(parts),
         "agents": {name: {"findings": r.findings, "source_count": r.source_count, "confidence": r.confidence, "sources": r.sources} for name, r in results.items()},
