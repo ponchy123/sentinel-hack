@@ -11,6 +11,7 @@ FRAMES_DIR = os.path.join(BASE, "frames")
 AUDIO_DIR = os.path.join(BASE, "audio")
 OUTPUT_DIR = os.path.join(BASE, "output")
 FFMPEG = "ffmpeg"
+FFPROBE = "ffprobe"
 
 for d in [FRAMES_DIR, AUDIO_DIR, OUTPUT_DIR]:
     os.makedirs(d, exist_ok=True)
@@ -31,13 +32,18 @@ WHITE = (255, 255, 255)
 SCENES = [
     {
         "name": "title",
-        "narration": "Welcome to Sentinel, a privacy-first multi-agent research network. Built for the UK AI Agent Hackathon.",
+        "narration": "Welcome to Sentinel, a privacy-first multi-agent research network. Built for the UK AI Agent Hackathon with eight sponsor integrations.",
         "subtitle": "Sentinel — Privacy-First Multi-Agent Research",
     },
     {
         "name": "architecture",
-        "narration": "Sentinel uses three specialized agents working in parallel: Academic for papers, Market for finance, and Code for repositories. All queries are protected by Venice AI's zero data retention, and results are verified on Bittensor.",
-        "subtitle": "Multi-Agent Architecture + Privacy Layer",
+        "narration": "Three specialist agents search Academic, Market, and Code sources in parallel. All queries go through Venice AI's zero data retention API. Results are verified across four blockchain networks: Bittensor, Kaspa, Ethereum, and CoralOS on Solana. BasedAI provides governance scoring for every agent decision.",
+        "subtitle": "Multi-Agent + Multi-Chain + Governance",
+    },
+    {
+        "name": "integrations",
+        "narration": "Sentinel integrates eight sponsors: Fetch.ai for agent orchestration, Venice AI for privacy, Bittensor for decentralized scoring, Kaspa and Ethereum for on-chain records, CoralOS for agent registry, BasedAI for governance, and Conduct AI as title sponsor.",
+        "subtitle": "8 Bounty Integrations",
     },
     {
         "name": "dashboard_idle",
@@ -51,12 +57,12 @@ SCENES = [
     },
     {
         "name": "report",
-        "narration": "Results are aggregated into a cited research report with source quality metrics. The Bittensor verification score confirms decentralized validation. Download the full report as Markdown.",
-        "subtitle": "Cited report + Bittensor verification",
+        "narration": "Results are aggregated into a cited report with source quality metrics. The report includes Bittensor verification, BasedAI governance scores, Kaspa and Ethereum on-chain records, and CoralOS agent registration. Download the full report as Markdown.",
+        "subtitle": "Full verification stack in every report",
     },
     {
         "name": "closing",
-        "narration": "Sentinel. Privacy-first, multi-agent, verified. Check out the code on GitHub.",
+        "narration": "Sentinel. Privacy-first, multi-agent, multi-chain verified. Check out the code on GitHub.",
         "subtitle": "github.com/ponchy123/sentinel-hack",
     },
 ]
@@ -86,7 +92,7 @@ def generate_tts(text, output_path):
 def get_audio_duration(path):
     """Get audio duration using ffprobe."""
     result = subprocess.run(
-        [FFMPEG.replace("ffmpeg.exe", "ffprobe.exe"), "-v", "error", "-show_entries", "format=duration",
+        [FFPROBE, "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", path],
         capture_output=True, text=True
     )
@@ -130,6 +136,27 @@ def render_scene(scene_name, subtitle_text):
         draw_rounded(draw, (W//2-160, 740, W//2+160, 800), 8, SURFACE, GREEN)
         draw.text((W//2, 765), "Bittensor Verification", fill=GREEN, font=get_font(20, True), anchor="mm")
 
+    elif scene_name == "integrations":
+        draw.text((W//2, 60), "8 Bounty Integrations", fill=ACCENT2, font=get_font(36, True), anchor="mm")
+        integrations = [
+            ("Fetch.ai", "Agent Framework", ACCENT, 200),
+            ("Venice.ai", "Privacy LLM", ACCENT2, 200),
+            ("Bittensor", "Decentralized Score", GREEN, 500),
+            ("Conduct AI", "Title Sponsor", YELLOW, 500),
+            ("BasedAI", "Governance", (200, 100, 255), 800),
+            ("Kaspa", "BlockDAG Record", (0, 200, 150), 800),
+            ("CoralOS", "Solana Registry", (255, 150, 50), 1100),
+            ("GCC & ETH", "Ethereum Record", (100, 150, 255), 1100),
+        ]
+        for i, (name, desc, color, x_base) in enumerate(integrations):
+            row = i // 2
+            col = i % 2
+            cx = x_base + col * 200
+            cy = 160 + row * 200
+            draw_rounded(draw, (cx-80, cy, cx+160, cy+80), 10, SURFACE, color)
+            draw.text((cx+40, cy+25), name, fill=WHITE, font=get_font(16, True), anchor="mm")
+            draw.text((cx+40, cy+55), desc, fill=DIM, font=get_font(12), anchor="mm")
+
     elif scene_name == "dashboard_idle":
         _draw_dashboard(draw)
         draw.text((W//2, 450), "Enter a topic and click", fill=DIM, font=get_font(20), anchor="mm")
@@ -156,33 +183,45 @@ def render_scene(scene_name, subtitle_text):
 
     elif scene_name == "report":
         _draw_dashboard(draw)
-        for i, (name, icon) in enumerate([("Academic", "✓"), ("Market", "✓"), ("Code", "✓"), ("Bittensor", "✓")]):
-            cx = 200 + i*420
-            draw_rounded(draw, (cx, 260, cx+380, 330), 12, SURFACE, GREEN)
+        # Agent status cards
+        for i, (name, icon) in enumerate([("Academic", "✓"), ("Market", "✓"), ("Code", "✓")]):
+            cx = 200 + i*560
+            draw_rounded(draw, (cx, 260, cx+520, 330), 12, SURFACE, GREEN)
             draw.text((cx+10, 275), name, fill=DIM, font=get_font(14))
-            draw.text((cx+190, 300), icon, fill=GREEN, font=get_font(32), anchor="mm")
+            draw.text((cx+260, 295), icon, fill=GREEN, font=get_font(28), anchor="mm")
         # Source quality
-        draw_rounded(draw, (200, 360, W-200, 440), 12, SURFACE, BORDER)
-        draw.text((220, 375), "Source Quality", fill=ACCENT2, font=get_font(18, True))
-        draw.text((400, 410), "23 Sources", fill=ACCENT2, font=get_font(22, True), anchor="mm")
-        draw.text((800, 410), "72% Confidence", fill=ACCENT2, font=get_font(22, True), anchor="mm")
-        draw.text((1200, 410), "Score: 0.6", fill=GREEN, font=get_font(22, True), anchor="mm")
-        # Report preview
-        draw_rounded(draw, (200, 470, W-200, 700), 12, SURFACE, BORDER)
-        draw.text((220, 485), "Research Report", fill=ACCENT2, font=get_font(18, True))
-        draw.text((220, 520), "# AI agent safety mechanisms", fill=WHITE, font=get_font(16, True))
-        draw.text((220, 550), "## Academic Research", fill=ACCENT2, font=get_font(14, True))
-        draw.text((220, 575), "AI agent safety is a critical area...", fill=TEXT, font=get_font(12))
-        draw.text((220, 605), "## Code Research", fill=ACCENT2, font=get_font(14, True))
-        draw.text((220, 630), "- katanemo/plano (6609 stars)", fill=TEXT, font=get_font(12))
-        draw.text((220, 660), "## Decentralized Verification", fill=ACCENT2, font=get_font(14, True))
+        draw_rounded(draw, (200, 355, W-200, 430), 12, SURFACE, BORDER)
+        draw.text((220, 370), "Source Quality", fill=ACCENT2, font=get_font(18, True))
+        draw.text((450, 400), "23 Sources", fill=ACCENT2, font=get_font(20, True), anchor="mm")
+        draw.text((850, 400), "72% Confidence", fill=ACCENT2, font=get_font(20, True), anchor="mm")
+        draw.text((1300, 400), "Score: 0.6", fill=GREEN, font=get_font(20, True), anchor="mm")
+        # Verification stack
+        draw_rounded(draw, (200, 450, W-200, 700), 12, SURFACE, BORDER)
+        draw.text((220, 465), "Multi-Chain Verification Stack", fill=ACCENT2, font=get_font(18, True))
+        checks = [
+            ("Bittensor", "Score: 0.6", GREEN),
+            ("BasedAI", "Trust: 0.85", (200, 100, 255)),
+            ("Kaspa", "Hash: c743b28d...", (0, 200, 150)),
+            ("Ethereum", "Tx: 0x2504...", (100, 150, 255)),
+            ("CoralOS", "3 agents registered", (255, 150, 50)),
+        ]
+        for j, (name, detail, color) in enumerate(checks):
+            y = 500 + j*38
+            draw.ellipse([(230, y+2), (244, y+16)], fill=color)
+            draw.text((260, y+9), name, fill=WHITE, font=get_font(14, True), anchor="lm")
+            draw.text((420, y+9), detail, fill=DIM, font=get_font(12), anchor="lm")
+            draw.text((700, y+9), "✓ Verified", fill=GREEN, font=get_font(12), anchor="lm")
         draw.text((220, 685), "Bittensor Score: 0.6", fill=GREEN, font=get_font(12))
 
     elif scene_name == "closing":
-        draw.text((W//2, H//2-150), "Sentinel", fill=ACCENT2, font=get_font(64, True), anchor="mm")
-        draw.text((W//2, H//2-70), "Privacy-First Multi-Agent Research", fill=TEXT, font=get_font(28), anchor="mm")
-        draw.text((W//2, H//2+20), "Fetch.ai  •  Venice.ai  •  Bittensor", fill=ACCENT, font=get_font(22, True), anchor="mm")
-        draw.text((W//2, H//2+70), "github.com/ponchy123/sentinel-hack", fill=ACCENT2, font=get_font(18), anchor="mm")
+        draw.text((W//2, H//2-180), "Sentinel", fill=ACCENT2, font=get_font(64, True), anchor="mm")
+        draw.text((W//2, H//2-100), "Privacy-First Multi-Agent Research", fill=TEXT, font=get_font(28), anchor="mm")
+        draw.text((W//2, H//2-40), "8 Bounty Integrations  •  Multi-Chain Verified", fill=DIM, font=get_font(18), anchor="mm")
+        sponsors = "Fetch.ai  •  Venice.ai  •  Bittensor  •  BasedAI"
+        sponsors2 = "Kaspa  •  CoralOS  •  GCC & ETH  •  Conduct AI"
+        draw.text((W//2, H//2+20), sponsors, fill=ACCENT, font=get_font(18, True), anchor="mm")
+        draw.text((W//2, H//2+50), sponsors2, fill=ACCENT, font=get_font(18, True), anchor="mm")
+        draw.text((W//2, H//2+100), "github.com/ponchy123/sentinel-hack", fill=ACCENT2, font=get_font(18), anchor="mm")
 
     # Subtitle bar at bottom (all scenes)
     draw.rectangle([(0, H-100), (W, H)], fill=(0, 0, 0, 180))
