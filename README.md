@@ -1,8 +1,8 @@
 # Sentinel — Privacy-First Multi-Agent Research Network
 
 > A multi-agent research system where specialized AI agents collaborate autonomously
-> to produce cited reports, with all LLM inference routed through Venice.ai's
-> zero-data-retention infrastructure and results verified on Bittensor.
+> to produce cited reports, with all LLM inference routed through privacy-preserving
+> infrastructure and results verified across multiple blockchain networks.
 
 ## Architecture
 
@@ -12,14 +12,18 @@ User → Dashboard → FastAPI → Multi-Agent Engine
                                   ├── Market Agent (CoinGecko)
                                   └── Code Agent (GitHub)
                                       ↓
-                              Venice.ai Privacy Layer
+                              Venice.ai / Agnes AI Privacy Layer
                               (zero data retention)
                                       ↓
-                              Bittensor Verification
-                              (decentralized scoring)
+                              Multi-Chain Verification
+                              ├── Bittensor (decentralized scoring)
+                              ├── Kaspa (blockDAG record)
+                              ├── Ethereum (on-chain hash)
+                              └── CoralOS (Solana agent registry)
                                       ↓
-                              Cited Markdown Report
-                              (downloadable)
+                              BasedAI Governance Scoring
+                                      ↓
+                              Cited Markdown Report (downloadable)
 ```
 
 ## Quick Start
@@ -40,88 +44,84 @@ docker-compose up
 
 ### Option 3: Manual
 ```bash
-# 1. Get Venice.ai API Key (free, no credit card)
-#    Sign up → Settings → API → Generate Key
-
-# 2. Setup
 cp .env.example .env
-# Edit .env and add VENICE_API_KEY
+# Edit .env and add your API key
 
 pip install -r requirements.txt
 
-# 3. Start API
-python -m api.main
+python -m api.main  # API at http://localhost:8080
 
-# 4. Start Dashboard
-cd dashboard && npm install && npm run dev
+cd dashboard && npm install && npm run dev  # Dashboard at http://localhost:3000
 ```
-
-### 5. Use
-Open http://localhost:3000, enter a topic, click "Start Research".
 
 ## Features
 
-- **Multi-Agent Collaboration**: 3 specialist agents (Academic, Market, Code) work in parallel
-- **Privacy-First**: All LLM calls through Venice.ai with zero data retention
-- **Real Data Sources**: ArXiv papers, CoinGecko market data, GitHub repositories
-- **Decentralized Verification**: Bittensor network scores research quality
-- **Real-time Dashboard**: Live agent status, progress logs, source quality metrics
-- **Report Export**: Download research reports as Markdown
+- **Multi-Agent Collaboration**: 3 specialist agents work in parallel
+- **Privacy-First**: All LLM calls through zero-data-retention API
+- **Real Data Sources**: ArXiv, CoinGecko, GitHub
+- **Multi-Chain Verification**: Bittensor + Kaspa + Ethereum + CoralOS
+- **Governance Scoring**: BasedAI trust and accountability metrics
+- **Real-time Dashboard**: Live agent status, progress logs, source quality
+- **Report Export**: Download as Markdown
 
-## API Endpoints
+## Bounty Integrations
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/research` | Start a research session |
-| GET | `/api/status/{id}` | Get research status |
-| GET | `/api/report/{id}` | Get final report + source quality |
-| GET | `/api/export/{id}` | Download report as Markdown |
-| WS | `/ws/{id}` | Real-time agent updates |
+| Sponsor | Integration | What It Does |
+|---------|------------|--------------|
+| **Fetch.ai** | uAgents framework | Multi-agent orchestration and communication |
+| **Venice.ai** | Privacy LLM API | Zero data retention for all research queries |
+| **Bittensor** | SN44 verification | Decentralized quality scoring of research |
+| **Conduct AI** | Title sponsor | Enterprise multi-agent orchestration pattern |
+| **BasedAI** | Governance layer | Trust scores and accountability audit trail |
+| **Kaspa** | BlockDAG record | Research hash recorded on Kaspa chain |
+| **CoralOS** | Solana registry | Agent identities registered on Coral Protocol |
+| **GCC & ETH** | Ethereum record | Research hash stored on Ethereum network |
 
 ## Tech Stack
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| Agent Engine | Fetch.ai uAgents + custom engine | Multi-agent orchestration |
-| Privacy Layer | Venice.ai API | Zero data retention LLM |
-| Verification | Bittensor SN44 | Decentralized quality scoring |
+| Agent Engine | Fetch.ai uAgents | Multi-agent orchestration |
+| LLM | Agnes AI / Venice.ai | Privacy-preserving inference |
+| Governance | BasedAI | Decision scoring and audit |
+| Chains | Kaspa + Ethereum + Solana | Multi-chain verification |
 | Backend | FastAPI + WebSocket | Real-time API |
 | Frontend | React + Vite | Research dashboard |
-| Search | ArXiv + DuckDuckGo + CoinGecko + GitHub | Multi-source research |
 
 ## Project Structure
 
 ```
 sentinel-hack/
-├── agents/
-│   ├── engine.py        # Multi-agent research engine (core)
+├── agents/              # Multi-agent system
+│   ├── engine.py        # Core research engine
 │   ├── orchestrator.py  # Fetch.ai uAgent orchestrator
-│   ├── academic.py      # Academic specialist agent
-│   ├── market.py        # Market specialist agent
-│   └── code.py          # Code specialist agent
-├── research/
+│   ├── academic.py      # Academic specialist
+│   ├── market.py        # Market specialist
+│   └── code.py          # Code specialist
+├── research/            # Research logic
 │   ├── models.py        # Data models
-│   ├── venice_client.py # Venice.ai API client
+│   ├── venice_client.py # LLM API client
 │   ├── web_search.py    # Search providers
-│   └── agent.py         # Research agent logic
-├── api/
-│   └── main.py          # FastAPI backend
-├── dashboard/
-│   └── src/             # React frontend
+│   └── agent.py         # Research agent
+├── integrations/        # Sponsor integrations
+│   ├── basedai.py       # Governance scoring
+│   ├── kaspa.py         # Kaspa on-chain
+│   ├── coralos.py       # Solana agent registry
+│   └── eth.py           # Ethereum on-chain
 ├── verification/
 │   └── bittensor.py     # Bittensor verification
+├── api/                 # FastAPI backend
+├── dashboard/           # React frontend
+├── demo/                # Demo video + logo
 ├── Dockerfile
 ├── docker-compose.yml
-├── start.bat / start.sh
-└── README.md
+└── start.bat / start.sh
 ```
 
-## Sponsors Integrated
+## Demo
 
-- **Fetch.ai** — uAgents framework for multi-agent communication
-- **Venice.ai** — Privacy-preserving LLM API (zero data retention)
-- **Bittensor** — Decentralized verification of research quality
-- **Microsoft** — Azure OpenAI (available as LLM backbone)
+- **Video**: https://youtu.be/YupSyEpONgg
+- **GitHub**: https://github.com/ponchy123/sentinel-hack
 
 ## License
 
