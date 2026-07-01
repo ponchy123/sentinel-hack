@@ -1,0 +1,25 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8080/docs')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  dashboard:
+    image: node:20-slim
+    working_dir: /app
+    command: sh -c "npm install --registry https://registry.npmmirror.com && npx vite --host 0.0.0.0 --port 3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./dashboard:/app
+    depends_on:
+      - api
