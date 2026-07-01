@@ -120,7 +120,7 @@ sentinel-hack/
 
 ## Demo
 
-- **Video**: https://youtu.be/YupSyEpONgg
+- **Video**: https://youtu.be/Zo5GPcOBFPU
 - **GitHub**: https://github.com/ponchy123/sentinel-hack
 
 ## License
